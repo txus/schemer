@@ -1,0 +1,15 @@
+---
+layout: default
+title: Schemer
+description: Developing a Scheme interpreter in Ruby
+---
+
+{% for post in site.posts limit:5 %}
+<div class="post">
+  <h2><a href="{{ post.url }}">{{ page.description }} - {{ post.title }}</a></h2>
+  <span class="meta sidebar">
+    Post series<br />
+  </span>
+  {{ post.content }}
+</div>
+{% endfor %}
