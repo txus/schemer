@@ -3,7 +3,7 @@ lsi:         false
 server_port: 4000
 pygments:    true
 markdown:    rdiscount
-permalink:   /schemer/series/:title
+permalink:   /series/:title
 base_url:    http://txus.github.com/schemer
 title:       "Schemer - Developing a Scheme interpreter in Ruby"
 description: "Developing a Scheme interpreter in Ruby"
