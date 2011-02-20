@@ -33,10 +33,11 @@ module Schemer
     rule(:boolean)    { `#` >> (`t` | `f`).as(:boolean) }
     rule(:literal)    { numeric | string | character | boolean }
 
-    rule(:quote)      { `'` >> list.as(:quoted_list) }
-    rule(:vector)     { `#` >> list.as(:vector) }
-    rule(:list)       { lparen >> args >> rparen }
-    rule(:pair)       { lparen >> arg >> space >> dot >> space >> args >> rparen }
+    rule(:list)       { lparen >> args.as(:list) >> rparen }
+    rule(:vector)     { `#` >> lparen >> args.as(:vector) >> rparen }
+    rule(:quoted_list){ `'` >> lparen >> args.as(:quoted_list) >> rparen }
+
+    rule(:pair)       { lparen >> (arg >> space >> dot >> space >> args).as(:pair) >> rparen }
 
     rule(:symbol)     { letter >> (letter | integer | special_symbol).repeat(0) }
     rule(:quoted_symbol) { `'` >> symbol.as(:quoted_identifier) }
@@ -44,14 +45,14 @@ module Schemer
     rule(:operator)   { [`+`, `-`, `*`, `/`, `>=`, `<=`, `>`, `<`, `=`].inject(:|) }
 
 
-    rule(:arg)        { (symbol.as(:identifier) | quote | literal | quoted_symbol | expression | pair | vector | list) }
-    rule(:args)       { (arg >> space?).repeat.as(:args) }
+    rule(:arg)        { (symbol.as(:identifier) | quoted_list | literal | quoted_symbol | expression | pair | vector | list) }
+    rule(:args)       { (arg >> space?).repeat }
 
     rule(:newline)    { str("\n") }
     rule(:comment)    { `;`.repeat(1,3) >> (`\n`.absnt? >> any).repeat.as(:comment) }
-    rule(:expression) { (lparen >> (symbol.as(:identifier) | operator.as(:operator) | expression).as(:proc) >> (space? >> args).maybe >> rparen).as(:expression) }
+    rule(:expression) { (lparen >> (symbol.as(:identifier) | operator.as(:operator) | expression).as(:proc) >> (space? >> args.as(:args)).maybe >> rparen).as(:expression) }
 
-    rule(:body)       { (quote | expression | comment | space).repeat(0) }
+    rule(:body)       { (expression | comment | space).repeat(0) }
     root :body
 
   end

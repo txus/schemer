@@ -11,6 +11,12 @@ module Schemer
     rule(:boolean => simple(:boolean))    { boolean == 't' }
 
     rule(:identifier => simple(:identifier))    { AST::Identifier.new(identifier) }
+    rule(:quoted_identifier => simple(:quoted_identifier))    { AST::QuotedIdentifier.new(quoted_identifier) }
+
+    rule(:list => subtree(:list))    { AST::List.new(list) }
+    rule(:quoted_list => subtree(:quoted_list))    { AST::QuotedList.new(quoted_list) }
+    rule(:vector => subtree(:vector))    { AST::Vector.new(vector) }
+    rule(:pair => subtree(:pair))    { AST::List.new(pair) }
 
     rule(:operator => simple(:operator)) do
       case operator

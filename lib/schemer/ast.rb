@@ -24,6 +24,18 @@ module Schemer
         "#<Identifier::#{@value}>"
       end
     end
+    
+    class QuotedIdentifier
+      attr_reader :value
+
+      def initialize(identifier)
+        @value = identifier
+      end
+
+      def inspect
+        "#<QuotedIdentifier::#{@value}>"
+      end
+    end
 
     class Expression
       attr_reader :proc, :args
@@ -35,6 +47,42 @@ module Schemer
 
       def inspect
         "#<Expression @proc=#{@proc.inspect} @args=#{@args || 'nil'}>"
+      end
+    end
+
+    class List
+      attr_reader :elements
+
+      def initialize(elements)
+        @elements = elements
+      end
+
+      def inspect
+        "#<List @elements=#{@elements}>"
+      end
+    end
+
+    class QuotedList
+      attr_reader :elements
+
+      def initialize(elements)
+        @elements = elements
+      end
+
+      def inspect
+        "#<QuotedList @elements=#{@elements}>"
+      end
+    end
+
+    class Vector
+      attr_reader :elements
+
+      def initialize(elements)
+        @elements = elements
+      end
+
+      def inspect
+        "#<Vector @elements=#{@elements}>"
       end
     end
 

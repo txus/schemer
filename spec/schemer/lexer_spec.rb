@@ -36,15 +36,15 @@ module Schemer
     its(:literal) { should parse('#\z').as(:char => 'z') }
     its(:literal) { should parse('#t').as(:boolean => 't') }
 
-    its(:quote) { should parse("'(1 2 3)") }
-    its(:quote) { should parse("'()") }
+    its(:quoted_list) { should parse("'(1 2 3)") }
+    its(:quoted_list) { should parse("'()") }
     its(:vector) { should parse("#(1 '(2 4) 3)") }
 
     its(:pair) { should parse('(1 . 2)') }
     its(:pair) { should parse('(1 . (2 3))') }
 
-    its(:list) { should parse('(1 2 3)') }
-    its(:list) { should parse('()') }
+    its(:list) { should parse('(1 2 3)').as(:list => [{:integer => '1'}, {:integer => '2'}, {:integer => '3'}]) }
+    its(:list) { should parse('()').as(:list => []) }
     its(:list) { should parse('( )') }
 
     its(:expression) { should parse('(define some "string" #t)') }
@@ -56,8 +56,8 @@ module Schemer
     its(:expression) { should parse('(lambda (define zara \'zara) (write (eqv? zara \'zara)))') }
     its(:expression) { should(parse("(lambda (define (make-new-set?) '()) (define (make-new-set?) '(2 3)))").as do |output|
       output[:expression][:args].should have(2).expressions
-      output[:expression][:args].first[:expression][:args].should include(:quoted_list => {:args => []})
-      output[:expression][:args].last[:expression][:args].should include(:quoted_list => {:args => [{:integer =>"2"}, {:integer => "3"}]})
+      output[:expression][:args].first[:expression][:args].should include(:quoted_list => [])
+      output[:expression][:args].last[:expression][:args].should include(:quoted_list => [{:integer =>"2"}, {:integer => "3"}])
     end) }
 
     # Regression tests

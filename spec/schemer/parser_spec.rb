@@ -47,10 +47,20 @@ module Schemer
     end
 
     describe "Identifiers" do
-      it "are transformed into Identifiers" do
-        text = "(proc my_identifier)"
-        parsed = subject.apply(lexer.parse text).first.args
-        parsed.first.should be_an(AST::Identifier)
+      describe "Regular identifiers" do
+        it "are transformed into Identifiers" do
+          text = "(proc my_identifier)"
+          parsed = subject.apply(lexer.parse text).first.args
+          parsed.first.should be_an(AST::Identifier)
+        end
+      end
+
+      describe "Quoted identifiers" do
+        it "are transformed into QuotedIdentifiers" do
+          text = "(proc 'quoted_identifier)"
+          parsed = subject.apply(lexer.parse text).first.args
+          parsed.first.should be_an(AST::QuotedIdentifier)
+        end
       end
     end
 
@@ -79,6 +89,43 @@ module Schemer
         parsed = subject.apply(lexer.parse text).first
         parsed.should be_an(AST::Expression)
         parsed.args.first.should be_an(AST::Expression)
+      end
+    end
+
+    describe "Lists" do
+      describe "Regular lists" do
+        it 'are transformed into Lists' do
+          text = "(lambda (1 2 3))"
+          parsed = subject.apply(lexer.parse text).first.args.first
+          parsed.should be_an(AST::List)
+          parsed.elements.should == [1, 2, 3]
+        end
+      end
+      describe "Quoted lists" do
+        it 'are transformed into QuotedLists' do
+          text = "(lambda '(1 2 3))"
+          parsed = subject.apply(lexer.parse text).first.args.first
+          parsed.should be_an(AST::QuotedList)
+          parsed.elements.should == [1, 2, 3]
+        end
+      end
+      describe "Vectors" do
+        it 'are transformed into Vectors' do
+          text = "(lambda #(1 2 3))"
+          parsed = subject.apply(lexer.parse text).first.args.first
+          parsed.should be_an(AST::Vector)
+          parsed.elements.should == [1, 2, 3]
+        end
+      end
+      describe "Pairs" do
+        it 'are combined into Lists' do
+          text = "(lambda (1 . (2 3)))"
+          parsed = subject.apply(lexer.parse text).first.args.first
+          parsed.should be_an(AST::List)
+          parsed.elements.first.should == 1
+          parsed.elements.last.should be_an(AST::List)
+          parsed.elements.last.elements.should == [2, 3]
+        end
       end
     end
 
