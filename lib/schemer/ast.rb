@@ -58,9 +58,19 @@ module Schemer
         "#<Operator::Divide>"
       end
     end
+    class GteOperator
+      def inspect
+        "#<Operator::GreaterThanOrEqual>"
+      end
+    end
     class GtOperator
       def inspect
         "#<Operator::GreaterThan>"
+      end
+    end
+    class LteOperator
+      def inspect
+        "#<Operator::LowerThanOrEqual>"
       end
     end
     class LtOperator

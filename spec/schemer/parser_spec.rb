@@ -43,7 +43,7 @@ module Schemer
 
 (define myset 
     (adjoin-set 25 
-        (adjoin-set 13 
+        (<= 13 
             (adjoin-set 72
                 (adjoin-set 4 (make-new-set))))))
 
@@ -58,6 +58,7 @@ module Schemer
       lexer = Lexer.new
       tree = lexer.parse text
       hey = Parser.new.apply tree
+      pp hey
     end
 
   end

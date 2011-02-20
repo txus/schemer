@@ -22,6 +22,10 @@ module Schemer
         AST::MultiplyOperator.new
       when '/'
         AST::DivideOperator.new
+      when '>='
+        AST::GteOperator.new
+      when '<='
+        AST::LteOperator.new
       when '>'
         AST::GtOperator.new
       when '<'
