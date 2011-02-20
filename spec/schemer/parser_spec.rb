@@ -3,62 +3,83 @@ require 'spec_helper'
 module Schemer
   describe Parser do
     subject { Parser.new }
+    let(:lexer) { Lexer.new }
 
-    let(:text) do
-"""
-
-; Abstraction of a binary tree. Each tree is recursively defined as a list
-; with the entry (data), left subtree and right subtree. Left and right can
-; be null.
-;
-(define (entry tree) (car tree))
-(define (left-branch tree) (cadr tree))
-(define (right-branch tree) (caddr tree))
-(define (make-tree entry left right)
-    (list entry left right))
-
-(define (make-new-set)
-    '())
-
-(define (element-of-set? x set)
-    (cond
-        ((null? set) #f)
-        ((= x (entry set)) #t)
-        ((< x (entry set)) (element-of-set? x (left-branch set)))
-        ((> x (entry set)) (element-of-set? x (right-branch set)))))
-
-(define (adjoin-set x set)
-    (cond 
-        ((null? set) (make-tree x '() '()))
-        ((= x (entry set)) set)
-        ((< x (entry set))
-            (make-tree  (entry set)
-                        (adjoin-set x (left-branch set))
-                        (right-branch set)))
-        ((> x (entry set))
-            (make-tree  (entry set)
-                        (left-branch set)
-                        (adjoin-set x (right-branch set))))))
-
-
-(define myset 
-    (adjoin-set 25 
-        (<= 13 
-            (adjoin-set 72
-                (adjoin-set 4 (make-new-set))))))
-
-(write (element-of-set? 4 myset))
-(write (element-of-set? 5 myset))
-(write (element-of-set? 26 myset))
-(write (element-of-set? 25 myset))
-"""
+    describe "Strings" do
+      it "suffer no change" do
+        text = "(proc \"my string\")"
+        parsed = subject.apply(lexer.parse text).first.args
+        parsed.should include("my string")
+      end
     end
 
-    it 'craps' do
-      lexer = Lexer.new
-      tree = lexer.parse text
-      hey = Parser.new.apply tree
-      pp hey
+    describe "Integers" do
+      it "are typecasted from string" do
+        text = "(proc 29)"
+        parsed = subject.apply(lexer.parse text).first.args
+        parsed.should include(29)
+      end
+    end
+
+    describe "Floats" do
+      it "are typecasted from string" do
+        text = "(proc 29.42)"
+        parsed = subject.apply(lexer.parse text).first.args
+        parsed.should include(29.42)
+      end
+    end
+
+    describe "Chars" do
+      it "are transformed into CharacterLiterals" do
+        text = "(proc #\\z)"
+        parsed = subject.apply(lexer.parse text).first.args
+        parsed.first.should be_an(AST::CharacterLiteral)
+      end
+    end
+
+    describe "Booleans" do
+      it "are directly evaluated" do
+        text = "(proc #f #t)"
+        parsed = subject.apply(lexer.parse text).first.args
+        parsed.first.should eq(false)
+        parsed.last.should eq(true)
+      end
+    end
+
+    describe "Identifiers" do
+      it "are transformed into Identifiers" do
+        text = "(proc my_identifier)"
+        parsed = subject.apply(lexer.parse text).first.args
+        parsed.first.should be_an(AST::Identifier)
+      end
+    end
+
+    describe "Operators" do
+      it "are transformed into its kind on parsing time" do
+        {
+          "+"  => AST::AddOperator,
+          "-"  => AST::SubtractOperator,
+          "*"  => AST::MultiplyOperator,
+          "/"  => AST::DivideOperator,
+          ">=" => AST::GteOperator,
+          "<=" => AST::LteOperator,
+          ">"  => AST::GtOperator,
+          "<"  => AST::LtOperator,
+          "="  => AST::EqualOperator,
+        }.each_pair do |operator, klass|
+          parsed = subject.apply(lexer.parse "(#{operator} 3 4)").first.proc
+          parsed.should be_a(klass)
+        end
+      end
+    end
+
+    describe "Expressions" do
+      it "are transformed into Expressions recursively" do
+        text = "(lambda (my-proc))"
+        parsed = subject.apply(lexer.parse text).first
+        parsed.should be_an(AST::Expression)
+        parsed.args.first.should be_an(AST::Expression)
+      end
     end
 
   end
