@@ -17,7 +17,12 @@ module Schemer
       attr_reader :value
 
       def initialize(identifier)
-        @value = identifier
+        @value = identifier.to_sym
+      end
+
+      def eval(context)
+        puts "needing #{@value}"
+        context.get_variable(@value) || context.get_procedure(@value) || self
       end
 
       def inspect
@@ -43,6 +48,21 @@ module Schemer
       def initialize(expression)
         @proc = expression[:proc]
         @args = expression[:args].empty? ? nil : expression[:args]
+      end
+
+      def eval(context)
+        hash = @proc.eval(context)
+        procedure, evaluate_car, arity = 
+          hash[:implementation], hash[:evaluate_car], hash[:arity]
+
+        raise "Called with wrong number of arguments (#{args.count} for #{arity})" unless args.count == arity
+
+        args = @args.map do |arg|
+          evaluate_car == true ? arg.eval(context)
+                               : arg
+        end
+
+        procedure.call *args
       end
 
       def inspect

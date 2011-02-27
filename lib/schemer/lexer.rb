@@ -50,7 +50,7 @@ module Schemer
 
     rule(:newline)    { str("\n") }
     rule(:comment)    { `;`.repeat(1,3) >> (`\n`.absnt? >> any).repeat.as(:comment) }
-    rule(:expression) { (lparen >> (symbol.as(:identifier) | operator.as(:operator) | expression).as(:proc) >> (space? >> args.as(:args)).maybe >> rparen).as(:expression) }
+    rule(:expression) { (lparen >> (symbol.as(:identifier) | operator.as(:identifier) | expression).as(:proc) >> (space? >> args.as(:args)).maybe >> rparen).as(:expression) }
 
     rule(:body)       { (expression | comment | space).repeat(0) }
     root :body
