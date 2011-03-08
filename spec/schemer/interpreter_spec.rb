@@ -189,6 +189,18 @@ module Schemer
         end
       end
 
+      describe "#eqv?" do
+        it 'returns the equivalenc of two arguments' do
+          expression = "(eqv? 3 (+ 1 2))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should be_true
+        end
+      end
+
       describe "#<" do
         it 'returns true if foo is less than bar' do
           expression = "(< 3 (+ 2 2))"
@@ -234,6 +246,22 @@ module Schemer
         end
       end
 
+    end
+
+    describe "Regression tests from examples/ directory" do
+      Dir["examples/*.scm"].each do |filename|
+        file = File.read(filename)
+        it "interprets #{filename}" do
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse file) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          expect {
+            interpreter.walk
+          }.to_not raise_error
+        end
+      end
     end
 
   end

@@ -92,6 +92,10 @@ module Schemer
           one == another
         end)
 
+        env.add_binding(:eqv?, lambda do |one, another|
+          one == another
+        end)
+
         env.add_binding(">", lambda do |one, another|
           one > another
         end)

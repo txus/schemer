@@ -22,28 +22,5 @@ module Schemer
 
     rule(:expression => subtree(:expression))   { AST::Expression.new(expression) }
 
-    # rule(:operator => simple(:operator)) do
-    #   case operator
-    #   when '+'
-    #     AST::AddOperator.new
-    #   when '-'
-    #     AST::SubtractOperator.new
-    #   when '*'
-    #     AST::MultiplyOperator.new
-    #   when '/'
-    #     AST::DivideOperator.new
-    #   when '>='
-    #     AST::GteOperator.new
-    #   when '<='
-    #     AST::LteOperator.new
-    #   when '>'
-    #     AST::GtOperator.new
-    #   when '<'
-    #     AST::LtOperator.new
-    #   when '='
-    #     AST::EqualOperator.new
-    #   end
-    # end
-
   end
 end
