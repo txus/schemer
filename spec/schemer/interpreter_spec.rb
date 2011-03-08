@@ -60,8 +60,27 @@ module Schemer
           interpreter.walk.should be_nil
           interpreter.env.get_binding(:number).should == 3
         end
+        it 'defines a variable from an expression' do
+          expression = "(define number (* 3 2))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should be_nil
+          interpreter.env.get_binding(:number).should == 6
+        end
         it 'defines a function' do
           expression = "(define (square x) (* x x))(square 5)"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should == 25
+        end
+        it 'defines a function from a lambda' do
+          expression = "(define square (lambda (x) (* x x)))(square 5)"
           lexer = Schemer::Lexer.new
           parser = Schemer::Parser.new
           ast = parser.apply(lexer.parse expression) 

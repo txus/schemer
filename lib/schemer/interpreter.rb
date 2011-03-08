@@ -28,22 +28,40 @@ module Schemer
           nil
         end)
 
-        env.add_binding(:define, lambda do |args, block|
-          if args.is_a?(AST::Identifier)
-            env.add_binding(args.value, block)
+        env.add_binding(:define, lambda do |parameters, body|
+          if parameters.is_a?(AST::Identifier)
+            # We are declaring a variable. We must eager-evaluate the value.
+            result = if body.is_a?(AST::Expression)
+              body.eval(env)
+            else
+              body
+            end
+            env.add_binding(parameters.value, result)
             return nil
           end
-          original_args = args.to_list.to_a
-          name = original_args.shift
+          original_params = parameters.to_list.to_a
+          name = original_params.shift
 
           env.add_binding(name.value, lambda do |*args|
+            # Create a new scope
             environment = Environment.new(env)
             args.each_with_index do |arg, idx|
-              environment.add_binding(original_args[idx].value, arg.eval(environment))
+              environment.add_binding(original_params[idx].value, arg.eval(environment))
             end
-            block.eval(environment)
+            body.eval(environment)
           end)
           nil
+        end)
+
+        env.add_binding(:lambda, lambda do |parameters, body|
+          original_params = parameters.to_list.to_a
+          lambda do |*args|
+            environment = Environment.new(env)
+            args.each_with_index do |arg, idx|
+              environment.add_binding(original_params[idx].value, arg.eval(environment))
+            end
+            body.eval(environment)
+          end
         end)
 
       end
