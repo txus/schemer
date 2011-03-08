@@ -64,6 +64,14 @@ module Schemer
           end
         end)
 
+        env.add_binding(:car, lambda do |list|
+          list.to_list.elements.first
+        end)
+
+        env.add_binding(:cdr, lambda do |list|
+          list.to_list.elements.last
+        end)
+
       end
     end
 

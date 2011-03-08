@@ -90,6 +90,30 @@ module Schemer
         end
       end
 
+      describe "#car" do
+        it 'returns the first element from a list' do
+          expression = "(car (x 3))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should be_a(AST::Identifier)
+        end
+      end
+
+      describe "#cdr" do
+        it 'returns the last element from a list' do
+          expression = "(cdr (x 3))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should == 3
+        end
+      end
+
     end
 
   end

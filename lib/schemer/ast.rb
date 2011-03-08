@@ -90,6 +90,10 @@ module Schemer
         @elements.to_a
       end
 
+      def to_list
+        self
+      end
+
       def empty?
         @elements.empty?
       end
