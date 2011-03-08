@@ -72,6 +72,35 @@ module Schemer
           list.to_list.elements.last
         end)
 
+        env.add_binding(:list, lambda do |*args|
+          AST::List.new(args)
+        end)
+
+        env.add_binding(:null?, lambda do |object|
+          (object.respond_to?(:empty?) && object.empty?) || object.nil?
+        end)
+
+        env.add_binding("=", lambda do |one, another|
+          one == another
+        end)
+
+        env.add_binding(">", lambda do |one, another|
+          one > another
+        end)
+
+        env.add_binding("<", lambda do |one, another|
+          one < another
+        end)
+
+        env.add_binding(:cond, lambda do |*conditions|
+          conditions.map!(&:to_list).map!(&:to_a)
+          conditions.each do |condition, result|
+            return result.eval(env) if condition.eval(env)
+          end
+          nil
+        end)
+
+
       end
     end
 

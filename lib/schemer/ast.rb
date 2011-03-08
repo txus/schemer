@@ -1,7 +1,16 @@
 module Schemer
   module AST
 
-    class CharacterLiteral
+    class Node
+      def true?
+        true
+      end
+      def false?
+        !true?
+      end
+    end
+
+    class CharacterLiteral < Node
       attr_reader :value
 
       def initialize(character)
@@ -13,7 +22,7 @@ module Schemer
       end
     end
 
-    class Identifier
+    class Identifier < Node
       attr_reader :value
 
       def initialize(identifier)
@@ -29,7 +38,7 @@ module Schemer
       end
     end
     
-    class QuotedIdentifier
+    class QuotedIdentifier < Node
       attr_reader :value
 
       def initialize(identifier)
@@ -41,7 +50,7 @@ module Schemer
       end
     end
 
-    class Expression
+    class Expression < Node
       attr_reader :proc, :args
 
       def initialize(expression)
@@ -56,7 +65,11 @@ module Schemer
           if arg.is_a?(Identifier)
             arg = context.get_binding(arg.value) || arg
           else
-            arg ||= arg.eval(context)
+            begin
+              arg = arg.eval(context)
+            rescue
+              arg
+            end
           end
         end if args
 
@@ -68,6 +81,12 @@ module Schemer
         end
 
         block.call(*arguments)
+      rescue NoMethodError=>e
+        if e.message =~ /#{@proc.value}/
+          raise "#{@proc.value} is not a defined procedure."
+        else
+          raise e
+        end
       end
 
       def to_list
@@ -79,7 +98,7 @@ module Schemer
       end
     end
 
-    class List
+    class List < Node
       attr_reader :elements
 
       def initialize(elements)
@@ -103,7 +122,7 @@ module Schemer
       end
     end
 
-    class QuotedList
+    class QuotedList < Node
       attr_reader :elements
 
       def initialize(elements)
@@ -115,7 +134,7 @@ module Schemer
       end
     end
 
-    class Vector
+    class Vector < Node
       attr_reader :elements
 
       def initialize(elements)
@@ -124,52 +143,6 @@ module Schemer
 
       def inspect
         "#<Vector @elements=#{@elements}>"
-      end
-    end
-
-    class AddOperator
-      def inspect
-        "#<Operator::Add>"
-      end
-    end
-    class SubtractOperator
-      def inspect
-        "#<Operator::Subtract>"
-      end
-    end
-    class MultiplyOperator
-      def inspect
-        "#<Operator::Multiply>"
-      end
-    end
-    class DivideOperator
-      def inspect
-        "#<Operator::Divide>"
-      end
-    end
-    class GteOperator
-      def inspect
-        "#<Operator::GreaterThanOrEqual>"
-      end
-    end
-    class GtOperator
-      def inspect
-        "#<Operator::GreaterThan>"
-      end
-    end
-    class LteOperator
-      def inspect
-        "#<Operator::LowerThanOrEqual>"
-      end
-    end
-    class LtOperator
-      def inspect
-        "#<Operator::LowerThan>"
-      end
-    end
-    class EqualOperator
-      def inspect
-        "#<Operator::Equal>"
       end
     end
 

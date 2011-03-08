@@ -8,11 +8,11 @@ module Schemer
     end
 
     def add_binding(name, value)
-      @bindings.update({ name => value })
+      @bindings.update({ name.to_s => value })
     end
 
     def get_binding(name)
-      if got = @bindings[name]
+      if got = @bindings[name.to_s]
         return got
       elsif ! @parent.nil?
         @parent.get_binding(name)

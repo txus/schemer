@@ -114,6 +114,102 @@ module Schemer
         end
       end
 
+      describe "#list" do
+        it 'converts elements to a list' do
+          expression = "(list 3 4 x y)"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          output = interpreter.walk
+          output.should be_a(AST::List)
+          output.should have(4).elements
+        end
+      end
+
+      describe "#null?" do
+        context 'if the object is nil' do
+          it 'returns true' do
+            expression = "(null? 3)"
+            lexer = Schemer::Lexer.new
+            parser = Schemer::Parser.new
+            ast = parser.apply(lexer.parse expression) 
+
+            interpreter = Schemer::Interpreter.new(ast)
+            interpreter.walk.should be_false
+          end
+        end
+        context 'if the object is empty or nil' do
+          it 'returns true' do
+            expression = "(null? ())"
+            lexer = Schemer::Lexer.new
+            parser = Schemer::Parser.new
+            ast = parser.apply(lexer.parse expression) 
+
+            interpreter = Schemer::Interpreter.new(ast)
+            interpreter.walk.should be_true
+          end
+        end
+      end
+
+      describe "#=" do
+        it 'returns the equality of two arguments' do
+          expression = "(= 3 (+ 1 2))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should be_true
+        end
+      end
+
+      describe "#<" do
+        it 'returns true if foo is less than bar' do
+          expression = "(< 3 (+ 2 2))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should be_true
+        end
+      end
+
+      describe "#>" do
+        it 'returns true if foo is more than bar' do
+          expression = "(> 3 (+ 2 2))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should be_false
+        end
+      end
+
+      describe "#cond" do
+        it 'returns the first condition that evaluates to true' do
+          expression = "(cond ((< 3 1) 9) ((>3 1) 7) )"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should == 7
+        end
+        it 'even if the result is an expression' do
+          expression = "(cond ((< 3 1) 9) ((>3 8) 7) ((= 3 3) (+ 3 9)) )"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should == 12
+        end
+      end
+
     end
 
   end
