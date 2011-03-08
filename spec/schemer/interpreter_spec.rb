@@ -50,7 +50,7 @@ module Schemer
       end
 
       describe "#define" do
-        pending 'defines a variable' do
+        it 'defines a variable' do
           expression = "(define number 3)"
           lexer = Schemer::Lexer.new
           parser = Schemer::Parser.new
@@ -58,26 +58,16 @@ module Schemer
 
           interpreter = Schemer::Interpreter.new(ast)
           interpreter.walk.should be_nil
-          interpreter.env.get_variable(:number).should == 3
+          interpreter.env.get_binding(:number).should == 3
         end
-        it 'defines a procedure' do
-          expression = "(define (double num) (+ num 4)) (double 3)"
+        it 'defines a function' do
+          expression = "(define (square x) (* x x))(square 5)"
           lexer = Schemer::Lexer.new
           parser = Schemer::Parser.new
           ast = parser.apply(lexer.parse expression) 
 
-          puts ast.inspect
-
           interpreter = Schemer::Interpreter.new(ast)
-          returned = interpreter.walk
-
-          procedure =  interpreter.env.get_procedure(:double)
-          procedure.should be_a_kind_of(Hash)
-          procedure[:implementation].should be_a_kind_of(Proc)
-          procedure[:arity].should == 1
-          procedure[:evaluate_car].should be_true
-
-          returned.should be_nil
+          interpreter.walk.should == 25
         end
       end
 

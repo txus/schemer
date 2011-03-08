@@ -21,8 +21,7 @@ module Schemer
       end
 
       def eval(context)
-        puts "needing #{@value}"
-        context.get_variable(@value) || context.get_procedure(@value) || self
+        context.get_binding(@value)
       end
 
       def inspect
@@ -47,22 +46,32 @@ module Schemer
 
       def initialize(expression)
         @proc = expression[:proc]
-        @args = expression[:args].empty? ? nil : expression[:args]
+        @args = expression[:args].empty? ? nil : expression[:args].to_a
       end
 
       def eval(context)
-        hash = @proc.eval(context)
-        procedure, evaluate_car, arity = 
-          hash[:implementation], hash[:evaluate_car], hash[:arity]
+        # Evaluate arguments
+        arguments = nil
+        arguments = args.map do |arg|
+          if arg.is_a?(Identifier)
+            arg = context.get_binding(arg.value) || arg
+          else
+            arg ||= arg.eval(context)
+          end
+        end if args
 
-        raise "Called with wrong number of arguments (#{args.count} for #{arity})" unless args.count == arity
-
-        args = @args.map do |arg|
-          evaluate_car == true ? arg.eval(context)
-                               : arg
+        # Evaluate proc
+        if @proc.respond_to?(:value)
+          block = context.get_binding(@proc.value)
+        else
+          block = @proc
         end
 
-        procedure.call *args
+        block.call(*arguments)
+      end
+
+      def to_list
+        List.new [@proc, @args].compact.flatten
       end
 
       def inspect
@@ -75,6 +84,14 @@ module Schemer
 
       def initialize(elements)
         @elements = elements
+      end
+
+      def to_a
+        @elements.to_a
+      end
+
+      def empty?
+        @elements.empty?
       end
 
       def inspect

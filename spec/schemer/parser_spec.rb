@@ -64,25 +64,6 @@ module Schemer
       end
     end
 
-    describe "Operators" do
-      it "are transformed into its kind on parsing time" do
-        {
-          "+"  => AST::AddOperator,
-          "-"  => AST::SubtractOperator,
-          "*"  => AST::MultiplyOperator,
-          "/"  => AST::DivideOperator,
-          ">=" => AST::GteOperator,
-          "<=" => AST::LteOperator,
-          ">"  => AST::GtOperator,
-          "<"  => AST::LtOperator,
-          "="  => AST::EqualOperator,
-        }.each_pair do |operator, klass|
-          parsed = subject.apply(lexer.parse "(#{operator} 3 4)").first.proc
-          parsed.should be_a(klass)
-        end
-      end
-    end
-
     describe "Expressions" do
       it "are transformed into Expressions recursively" do
         text = "(lambda (my-proc))"

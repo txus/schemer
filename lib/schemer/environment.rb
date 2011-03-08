@@ -2,38 +2,23 @@ module Schemer
   class Environment
 
     def initialize(parent = nil)
-      @variables = {}
-      @procedures = {}
+      @bindings = {}
       @parent = parent
-      yield self
+      yield self if block_given?
     end
 
-    def push_variable(name, value)
-      @variables.update({ name => value })
+    def add_binding(name, value)
+      @bindings.update({ name => value })
     end
 
-    def get_variable(name)
-      if var = @variables[name]
-        return var
+    def get_binding(name)
+      if got = @bindings[name]
+        return got
       elsif ! @parent.nil?
-        @parent.get_variable(name)
+        @parent.get_binding(name)
       else
         nil
       end
-    end
-
-    def get_procedure(name)
-      if var = @procedures[name]
-        return var
-      elsif ! @parent.nil?
-        @parent.get_procedure(name)
-      else
-        nil
-      end
-    end
-
-    def push_procedure(function, implementation, evaluate_car = true)
-      @procedures.update({ function => {:implementation => implementation, :evaluate_car => evaluate_car, :arity => implementation.arity} })
     end
 
   end

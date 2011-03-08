@@ -44,7 +44,6 @@ module Schemer
 
     rule(:operator)   { [`+`, `-`, `*`, `/`, `>=`, `<=`, `>`, `<`, `=`].inject(:|) }
 
-
     rule(:arg)        { (symbol.as(:identifier) | quoted_list | literal | quoted_symbol | expression | pair | vector | list) }
     rule(:args)       { (arg >> space?).repeat }
 

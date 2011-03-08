@@ -7,47 +7,44 @@ module Schemer
       @ast = ast
       @env = Environment.new do |env|
 
-        env.push_procedure(:+, lambda do |a, b| 
+        env.add_binding(:+, lambda do |a, b| 
           a + b
         end)
 
-        env.push_procedure(:-, lambda do |a, b| 
+        env.add_binding(:-, lambda do |a, b| 
           a - b
         end)
 
-        env.push_procedure(:*, lambda do |a, b| 
+        env.add_binding(:*, lambda do |a, b| 
           a * b
         end)
 
-        env.push_procedure(:/, lambda do |a, b| 
+        env.add_binding(:/, lambda do |a, b| 
           a / b
         end)
 
-        env.push_procedure(:write, lambda do |value| 
+        env.add_binding(:write, lambda do |value| 
           $stdout.print value
           nil
         end)
 
-        env.push_procedure(:define, lambda { |name, implementation| 
-          if name.is_a?(AST::Expression) 
-            names = name.args.map(&:value)
-            puts implementation.inspect
-            block = eval("lambda { |#{names.join(', ')}|
-              environment = Environment.new do |env|
-                #{names.each do |name|
-                   'env.push_variable(:' + name.to_s + ', ' + name.to_s + ')' 
-                  end}
-              end
-              implementation.eval(environment)
-            }")
-             
-            env.push_procedure(name.proc.value, block)
-          elsif name.is_a?(AST::Identifier)
-            value = implementation.eval(env)
-            env.push_variable(name.value, value)
+        env.add_binding(:define, lambda do |args, block|
+          if args.is_a?(AST::Identifier)
+            env.add_binding(args.value, block)
+            return nil
           end
+          original_args = args.to_list.to_a
+          name = original_args.shift
+
+          env.add_binding(name.value, lambda do |*args|
+            environment = Environment.new(env)
+            args.each_with_index do |arg, idx|
+              environment.add_binding(original_args[idx].value, arg.eval(environment))
+            end
+            block.eval(environment)
+          end)
           nil
-        }, false)
+        end)
 
       end
     end

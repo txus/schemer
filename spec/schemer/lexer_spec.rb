@@ -50,6 +50,14 @@ module Schemer
     its(:expression) { should parse('(define some "string" #t)') }
     its(:expression) { should parse(%q{((lambda some arg) (get_some_proc) yeah "string" ((proc-proc) "another-string"))}) }
     its(:expression) { should parse('((lambda) "foo")') }
+
+    # its(:expression) { should(parse('(lambda (x) (+ x x))').as do |output|
+    #   puts output.inspect
+    #   output[:expression][:proc].should == {:identifier => 'lambda'}
+    #   output[:expression][:args][0].should == {:list => [{:identifier => 'x'}]}
+    #   output[:expression][:args][1].should == {:expression => {:proc => {:identifier => '+'}, :args => [{:identifier => 'x'}, {:identifier => 'x'}]}}
+    # end) }
+
     its(:expression) { should parse("((lambda) (1 2 3))") }
     its(:expression) { should parse("((lambda) '(1 2 3))") }
     its(:expression) { should parse('((lambda) (bar))') }
