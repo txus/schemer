@@ -114,6 +114,30 @@ module Schemer
         end
       end
 
+      describe "#cadr" do
+        it 'returns the first element from the last element of a list' do
+          expression = "(cadr (x (3 2)))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should == 3
+        end
+      end
+
+      describe "#caddr" do
+        it 'returns the first element from the last element of the last element of a list' do
+          expression = "(caddr (x (3 (1 2))))"
+          lexer = Schemer::Lexer.new
+          parser = Schemer::Parser.new
+          ast = parser.apply(lexer.parse expression) 
+
+          interpreter = Schemer::Interpreter.new(ast)
+          interpreter.walk.should == 1
+        end
+      end
+
       describe "#list" do
         it 'converts elements to a list' do
           expression = "(list 3 4 x y)"

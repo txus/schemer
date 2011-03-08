@@ -72,6 +72,14 @@ module Schemer
           list.to_list.elements.last
         end)
 
+        env.add_binding(:cadr, lambda do |list|
+          list.to_list.elements.last.elements.first
+        end)
+
+        env.add_binding(:caddr, lambda do |list|
+          list.to_list.elements.last.elements.last.elements.first
+        end)
+
         env.add_binding(:list, lambda do |*args|
           AST::List.new(args)
         end)
