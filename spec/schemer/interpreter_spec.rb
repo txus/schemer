@@ -248,21 +248,5 @@ module Schemer
 
     end
 
-    describe "Regression tests from examples/ directory" do
-      Dir["examples/*.scm"].each do |filename|
-        file = File.read(filename)
-        it "interprets #{filename}" do
-          lexer = Schemer::Lexer.new
-          parser = Schemer::Parser.new
-          ast = parser.apply(lexer.parse file) 
-
-          interpreter = Schemer::Interpreter.new(ast)
-          expect {
-            interpreter.walk
-          }.to_not raise_error
-        end
-      end
-    end
-
   end
 end

@@ -9,12 +9,13 @@ Gem::Specification.new do |s|
   s.authors     = ["Josep M. Bach"]
   s.email       = ["josep.m.bach@gmail.com"]
   s.homepage    = "http://txus.github.com/schemer"
-  s.summary     = %q{Scheme interpreter in Ruby}
-  s.description = %q{A Scheme interpreter in Ruby, developed as a personal project for RMU Session 5}
+  s.summary     = %q{A Scheme interpreter in Ruby}
+  s.description = %q{A Scheme interpreter in Ruby}
 
   s.rubyforge_project = "schemer"
 
-  # s.add_runtime_dependency 'parslet'
+  s.add_runtime_dependency 'parslet', '~> 1.2.0'
+
   s.add_development_dependency 'rspec', '~> 2.5.0'
   s.add_development_dependency 'guard'
   s.add_development_dependency 'guard-rspec'

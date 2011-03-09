@@ -7,5 +7,4 @@ require 'schemer/environment'
 require 'schemer/interpreter'
 
 module Schemer
-  # Your code goes here...
 end

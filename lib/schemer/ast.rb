@@ -14,7 +14,7 @@ module Schemer
       attr_reader :value
 
       def initialize(character)
-        @value = character.bytes.first
+        @value = character.to_s.bytes.first
       end
 
       def inspect

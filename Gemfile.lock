@@ -1,15 +1,8 @@
-GIT
-  remote: git://github.com/txus/parslet
-  revision: 4c7962d1cf4425674099962fb6f51c3b5b057533
-  branch: improve_rspec_matcher
-  specs:
-    parslet (1.1.1)
-      blankslate (~> 2.0)
-
 PATH
   remote: .
   specs:
     schemer (0.0.1)
+      parslet (~> 1.2.0)
 
 GEM
   remote: http://rubygems.org/
@@ -27,6 +20,8 @@ GEM
       rake (>= 0.8.1)
     open_gem (1.4.2)
       launchy (~> 0.3.5)
+    parslet (1.2.0)
+      blankslate (~> 2.0)
     rake (0.8.7)
     rb-fsevent (0.3.10)
     rspec (2.5.0)
@@ -45,7 +40,6 @@ PLATFORMS
 DEPENDENCIES
   guard
   guard-rspec
-  parslet!
   rb-fsevent
   rspec (~> 2.5.0)
   schemer!
