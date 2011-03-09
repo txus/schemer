@@ -1,0 +1,5 @@
+lexer_benchmark.rb 
+
+2011-03-09
+   user     system      total        real
+  9.140000   0.070000   9.210000 (  9.206295)

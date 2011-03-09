@@ -8,9 +8,6 @@ module Schemer
     its(:rparen) { should parse(' )') }
     its(:space) { should parse("  \n") }
 
-    its(:text) { should parse(' this should be treated as text!! oh yeah I think it should    ') }
-    its(:text) { should parse('and without trimmable whitespace!!') }
-
     its(:symbol) { should parse('some_symbol') }
     its(:symbol) { should parse('s423-ome_symbol') }
     its(:symbol) { should parse('s423-ome_symbol?') }
@@ -28,7 +25,9 @@ module Schemer
     its(:comment) { should parse(';;; some comment!! "whoo"') }
 
     its(:integer) { should parse('123') }
+    its(:integer) { should parse('-123') }
     its(:float) { should parse('99.9') }
+    its(:float) { should parse('-99.9') }
 
     its(:literal) { should parse('123').as(:integer => '123') }
     its(:literal) { should parse('99.9').as(:float => '99.9') }
