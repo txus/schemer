@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+require 'schemer'
+require 'pp'
+
+lexer = Schemer::Lexer.new
+parser = Schemer::Parser.new
+
+DEBUG = false
+if ARGV[1] == '-d' || ARGV[1] == '--debug'
+  DEBUG = true
+end
+code = File.read(ARGV.first)
+
+tokens = lexer.parse(code)
+if DEBUG
+  puts "-----LEXER-----"
+  pp tokens
+end
+
+parsed = parser.apply(tokens)
+if DEBUG
+  puts "-----PARSER-----"
+  pp parsed
+end
+
+interpreter = Schemer::Interpreter.new(parsed)
+
+result = interpreter.walk
+if DEBUG
+  puts "-----OUTPUT-----"
+  pp result
+end
