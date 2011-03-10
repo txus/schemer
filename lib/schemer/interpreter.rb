@@ -31,7 +31,7 @@ module Schemer
         env.add_binding(:define, lambda do |parameters, body|
           if parameters.is_a?(AST::Identifier)
             # We are declaring a variable. We must eager-evaluate the value.
-            result = if body.is_a?(AST::Expression)
+            result = if body.is_a?(AST::Procedure)
               body.eval(env)
             else
               body

@@ -10,58 +10,6 @@ module Schemer
       end
     end
 
-    class IntegerLiteral < Node
-      attr_reader :value
-
-      def initialize(integer)
-        @value = integer.to_i
-      end
-
-      def inspect
-        "#<Integer::#{@value}>"
-      end
-    end
-
-    class FloatLiteral < Node
-      attr_reader :value
-
-      def initialize(float)
-        @value = float.to_f
-      end
-
-      def inspect
-        "#<Float::#{@value}>"
-      end
-    end
-
-    class FalseLiteral < Node
-      attr_reader :value
-
-      def initialize
-        @value = false
-      end
-
-      def inspect
-        "#<False>"
-      end
-
-      def true?
-        false
-      end
-    end
-
-    class TrueLiteral < Node
-      attr_reader :value
-
-      def initialize
-        @value = true
-      end
-
-      def inspect
-        "#<True>"
-      end
-    end
-
     class CharacterLiteral < Node
       attr_reader :value
 
@@ -71,18 +19,6 @@ module Schemer
 
       def inspect
         "#<Char::#{@value}>"
-      end
-    end
-
-    class StringLiteral < Node
-      attr_reader :value
-
-      def initialize(string)
-        @value = string.to_s
-      end
-
-      def inspect
-        "#<String::\"#{@value}\">"
       end
     end
 

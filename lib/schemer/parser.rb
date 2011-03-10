@@ -1,14 +1,14 @@
 module Schemer
   class Parser < Parslet::Transform
 
-    rule(:string => simple(:string))            { AST::StringLiteral.new(string) }
+    rule(:string => simple(:string))            { string }
 
-    rule(:integer => simple(:integer))          { AST::IntegerLiteral.new(integer) }
-    rule(:float => simple(:float))              { AST::FloatLiteral.new(float) }
+    rule(:integer => simple(:integer))          { integer.to_i }
+    rule(:float => simple(:float))              { float.to_f }
 
     rule(:char => simple(:char))                { AST::CharacterLiteral.new(char) }
 
-    rule(:boolean => simple(:boolean))          { boolean == 't' ? AST::TrueLiteral.new : AST::FalseLiteral.new }
+    rule(:boolean => simple(:boolean))          { boolean == 't' }
 
     rule(:identifier => 
            simple(:identifier))                 { AST::Identifier.new(identifier) }
