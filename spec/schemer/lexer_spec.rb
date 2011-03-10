@@ -6,7 +6,7 @@ module Schemer
 
     its(:lparen) { should parse('( ') }
     its(:rparen) { should parse(' )') }
-    its(:space) { should parse("  \n") }
+    its(:space)  { should parse("  \n") }
 
     its(:symbol) { should parse('some_symbol') }
     its(:symbol) { should parse('s423-ome_symbol') }
@@ -24,13 +24,13 @@ module Schemer
     its(:comment) { should parse(';; some comment!! "whoo"') }
     its(:comment) { should parse(';;; some comment!! "whoo"') }
 
-    its(:integer) { should parse('123') }
-    its(:integer) { should parse('-123') }
-    its(:float) { should parse('99.9') }
-    its(:float) { should parse('-99.9') }
+    its(:numeric) { should parse('123') }
+    its(:numeric) { should parse('-123') }
+    its(:numeric) { should parse('99.9') }
+    its(:numeric) { should parse('-99.9') }
 
     its(:literal) { should parse('123').as(:integer => '123') }
-    its(:literal) { should parse('99.9').as(:float => '99.9') }
+    its(:literal) { should parse('-99.9').as(:float => '-99.9') }
     its(:literal) { should parse('"hey"').as(:string => 'hey') }
     its(:literal) { should parse('#\z').as(:char => 'z') }
     its(:literal) { should parse('#t').as(:boolean => 't') }
@@ -46,25 +46,20 @@ module Schemer
     its(:list) { should parse('()').as(:list => []) }
     its(:list) { should parse('( )') }
 
-    its(:expression) { should parse('(define some "string" #t)') }
-    its(:expression) { should parse(%q{((lambda some arg) (get_some_proc) yeah "string" ((proc-proc) "another-string"))}) }
-    its(:expression) { should parse('((lambda) "foo")') }
+    its(:procedure) { should parse('(define some "string" #t)') }
+    its(:procedure) { should parse(%q{((lambda some arg) (get_some_proc) yeah "string" ((proc-proc) "another-string"))}) }
+    its(:procedure) { should parse('((lambda) "foo")') }
 
-    # its(:expression) { should(parse('(lambda (x) (+ x x))').as do |output|
-    #   puts output.inspect
-    #   output[:expression][:proc].should == {:identifier => 'lambda'}
-    #   output[:expression][:args][0].should == {:list => [{:identifier => 'x'}]}
-    #   output[:expression][:args][1].should == {:expression => {:proc => {:identifier => '+'}, :args => [{:identifier => 'x'}, {:identifier => 'x'}]}}
-    # end) }
+    its(:procedure) { should(parse('(lambda (x) (+ x x))')) }
 
-    its(:expression) { should parse("((lambda) (1 2 3))") }
-    its(:expression) { should parse("((lambda) '(1 2 3))") }
-    its(:expression) { should parse('((lambda) (bar))') }
-    its(:expression) { should parse('(lambda (define zara \'zara) (write (eqv? zara \'zara)))') }
-    its(:expression) { should(parse("(lambda (define (make-new-set?) '()) (define (make-new-set?) '(2 3)))").as do |output|
-      output[:expression][:args].should have(2).expressions
-      output[:expression][:args].first[:expression][:args].should include(:quoted_list => [])
-      output[:expression][:args].last[:expression][:args].should include(:quoted_list => [{:integer =>"2"}, {:integer => "3"}])
+    its(:procedure) { should parse("((lambda) (1 2 3))") }
+    its(:procedure) { should parse("((lambda) '(1 2 3))") }
+    its(:procedure) { should parse('((lambda) (bar))') }
+    its(:procedure) { should parse('(lambda (define zara \'zara) (write (eqv? zara \'zara)))') }
+    its(:procedure) { should(parse("(lambda (define (make-new-set?) '()) (define (make-new-set?) '(2 3)))").as do |output|
+      output[:procedure][:args].should have(2).procedures
+      output[:procedure][:args].first[:procedure][:args].should include(:quoted_list => [])
+      output[:procedure][:args].last[:procedure][:args].should include(:quoted_list => [{:integer =>"2"}, {:integer => "3"}])
     end) }
 
     # Regression tests

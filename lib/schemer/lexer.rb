@@ -19,7 +19,7 @@ module Schemer
 
     rule(:integer)    { match('\d').repeat(1) }
     rule(:float)      { integer.repeat(1) >> dot >> integer.repeat(1) }
-    rule(:numeric)    { `-`.maybe >> (float.as(:float) | integer.as(:integer)) }
+    rule(:numeric)    { ((`-`.maybe >> float).as(:float) | (`-`.maybe >> integer).as(:integer)) }
 
     rule(:character)  { `#\\` >> letter.as(:char) }
     rule(:boolean)    { `#` >> (`t` | `f`).as(:boolean) }
@@ -34,15 +34,13 @@ module Schemer
     rule(:symbol)     { letter >> (letter | integer | special_symbol).repeat(0) }
     rule(:quoted_symbol) { `'` >> symbol.as(:quoted_identifier) }
 
-    # rule(:operator)   { [`+`, `-`, `*`, `/`, `>=`, `<=`, `>`, `<`, `=`].inject(:|) }
     rule(:operator)   { `+` | `-` | `*` | `/` | `>=` | `<=` | `>` | `<` | `=` }
-    # rule(:operator)   { match("[\\+-\\*\\/<>=]") }
 
     rule(:arg)        { (symbol.as(:identifier) | quoted_list | literal | quoted_symbol | procedure | pair | vector | list) }
     rule(:args)       { (arg >> space?).repeat }
 
     rule(:comment)    { `;`.repeat(1,3) >> (`\n`.absnt? >> any).repeat.as(:comment) }
-    rule(:procedure) { (lparen >> (symbol.as(:identifier) | operator.as(:identifier) | procedure).as(:proc) >> (space? >> args.as(:args)).maybe >> rparen).as(:procedure) }
+    rule(:procedure) { (lparen >> ((symbol | operator).as(:identifier) | procedure).as(:proc) >> (space? >> args.as(:args)).maybe >> rparen).as(:procedure) }
 
     rule(:body)       { (procedure | space | comment).repeat(0) }
     root :body

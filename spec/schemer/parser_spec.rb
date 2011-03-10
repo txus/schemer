@@ -8,24 +8,24 @@ module Schemer
     describe "Strings" do
       it "suffer no change" do
         text = "(proc \"my string\")"
-        parsed = subject.apply(lexer.parse text).first.args
-        parsed.should include("my string")
+        parsed = subject.apply(lexer.parse text).first.args.first
+        parsed.value.should eq("my string")
       end
     end
 
     describe "Integers" do
       it "are typecasted from string" do
         text = "(proc 29)"
-        parsed = subject.apply(lexer.parse text).first.args
-        parsed.should include(29)
+        parsed = subject.apply(lexer.parse text).first.args.first
+        parsed.value.should eq(29)
       end
     end
 
     describe "Floats" do
       it "are typecasted from string" do
         text = "(proc 29.42)"
-        parsed = subject.apply(lexer.parse text).first.args
-        parsed.should include(29.42)
+        parsed = subject.apply(lexer.parse text).first.args.first
+        parsed.value.should eq(29.42)
       end
     end
 
@@ -41,8 +41,8 @@ module Schemer
       it "are directly evaluated" do
         text = "(proc #f #t)"
         parsed = subject.apply(lexer.parse text).first.args
-        parsed.first.should eq(false)
-        parsed.last.should eq(true)
+        parsed.first.value.should be_false
+        parsed.last.value.should be_true
       end
     end
 
@@ -68,8 +68,8 @@ module Schemer
       it "are transformed into Expressions recursively" do
         text = "(lambda (my-proc))"
         parsed = subject.apply(lexer.parse text).first
-        parsed.should be_an(AST::Expression)
-        parsed.args.first.should be_an(AST::Expression)
+        parsed.should be_an(AST::Procedure)
+        parsed.args.first.should be_an(AST::Procedure)
       end
     end
 
@@ -79,7 +79,9 @@ module Schemer
           text = "(lambda (1 2 3))"
           parsed = subject.apply(lexer.parse text).first.args.first
           parsed.should be_an(AST::List)
-          parsed.elements.should == [1, 2, 3]
+          parsed.elements[0].value.should eq(1)
+          parsed.elements[1].value.should eq(2)
+          parsed.elements[2].value.should eq(3)
         end
       end
       describe "Quoted lists" do
@@ -87,7 +89,9 @@ module Schemer
           text = "(lambda '(1 2 3))"
           parsed = subject.apply(lexer.parse text).first.args.first
           parsed.should be_an(AST::QuotedList)
-          parsed.elements.should == [1, 2, 3]
+          parsed.elements[0].value.should eq(1)
+          parsed.elements[1].value.should eq(2)
+          parsed.elements[2].value.should eq(3)
         end
       end
       describe "Vectors" do
@@ -95,7 +99,9 @@ module Schemer
           text = "(lambda #(1 2 3))"
           parsed = subject.apply(lexer.parse text).first.args.first
           parsed.should be_an(AST::Vector)
-          parsed.elements.should == [1, 2, 3]
+          parsed.elements[0].value.should eq(1)
+          parsed.elements[1].value.should eq(2)
+          parsed.elements[2].value.should eq(3)
         end
       end
       describe "Pairs" do
@@ -103,9 +109,10 @@ module Schemer
           text = "(lambda (1 . (2 3)))"
           parsed = subject.apply(lexer.parse text).first.args.first
           parsed.should be_an(AST::List)
-          parsed.elements.first.should == 1
+          parsed.elements.first.value.should == 1
           parsed.elements.last.should be_an(AST::List)
-          parsed.elements.last.elements.should == [2, 3]
+          parsed.elements.last.elements[0].value.should eq(2)
+          parsed.elements.last.elements[1].value.should eq(3)
         end
       end
     end
