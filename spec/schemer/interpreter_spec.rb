@@ -49,6 +49,12 @@ module Schemer
         end
       end
 
+      describe "#inspect" do
+        it 'returns the object inspected' do
+          "(inspect x)".should evaluate_to("#<Identifier::x>")
+        end
+      end
+
       describe "#define" do
         it 'defines a variable' do
           expression = "(define number 3)"

@@ -28,6 +28,10 @@ module Schemer
           nil
         end)
 
+        env.add_binding(:inspect, lambda do |object|
+          object.inspect
+        end)
+
         env.add_binding(:define, lambda do |parameters, body|
           if parameters.is_a?(AST::Identifier)
             # We are declaring a variable. We must eager-evaluate the value.
