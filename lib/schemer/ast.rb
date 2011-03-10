@@ -10,6 +10,21 @@ module Schemer
       end
     end
 
+    class Comment < Node
+      attr_reader :value
+
+      def initialize(comment)
+        @value = comment
+      end
+
+      def eval(context)
+      end
+
+      def inspect
+        "#<Comment::\"#{@value.inspect}\">"
+      end
+    end
+
     class CharacterLiteral < Node
       attr_reader :value
 
@@ -82,6 +97,8 @@ module Schemer
 
         block.call(*arguments)
       rescue NoMethodError=>e
+        puts e.inspect
+        puts e.backtrace.inspect
         if e.message =~ /#{@proc.value}/
           raise "#{@proc.value} is not a defined procedure."
         else
@@ -89,28 +106,43 @@ module Schemer
         end
       end
 
-      def to_list
-        List.new [@proc, @args].compact.flatten
+      def to_a
+        [@proc, @args].compact.flatten
       end
 
       def inspect
-        "#<Expression @proc=#{@proc.inspect} @args=#{@args || 'nil'}>"
+        "#<Procedure @proc=#{@proc.inspect} @args=#{@args || 'nil'}>"
       end
     end
 
     class List < Node
       attr_reader :elements
 
-      def initialize(elements)
-        @elements = elements
+      def initialize(elements, context = nil)
+        if context
+          @elements = elements.map do |element|
+            begin
+              evaled = element.eval(context)
+              evaled || element
+            rescue
+              element
+            end
+          end
+        else
+          @elements = elements
+        end
       end
 
       def to_a
-        @elements.to_a
+        @elements
       end
 
       def to_list
         self
+      end
+
+      def eval(context)
+        List.new(@elements, context)
       end
 
       def empty?
@@ -127,6 +159,10 @@ module Schemer
 
       def initialize(elements)
         @elements = elements
+      end
+
+      def eval(context)
+        self
       end
 
       def inspect
