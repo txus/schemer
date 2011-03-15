@@ -13,7 +13,7 @@ module Schemer
 
     def get_binding(name)
       if got = @bindings[name.to_s]
-        return got
+        got
       elsif ! @parent.nil?
         @parent.get_binding(name)
       else

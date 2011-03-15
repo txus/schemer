@@ -57,7 +57,7 @@ module Schemer
     its(:list) { should parse('((lambda) (bar))') }
     its(:list) { should parse('(lambda (define zara \'zara) (write (eqv? zara \'zara)))') }
     its(:list) { should(parse("(lambda (define (make-new-set?) '()) (define (make-new-set?) '(2 3)))").as do |output|
-      output[:list].should have(2).lists
+      output[:list].should have(3).elements
     end) }
 
     # Regression tests

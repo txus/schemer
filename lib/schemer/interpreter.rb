@@ -7,120 +7,122 @@ module Schemer
       @ast = ast
       @env = Environment.new do |env|
 
-        env.add_binding(:+, lambda do |a, b| 
-          a + b
+        env.add_binding(:+, lambda do |cxt, a, b|
+          a.eval(cxt) + b.eval(cxt)
         end)
 
-        env.add_binding(:-, lambda do |a, b| 
-          a - b
+        env.add_binding(:-, lambda do |cxt, a, b| 
+          a.eval(cxt) - b.eval(cxt)
         end)
 
-        env.add_binding(:*, lambda do |a, b| 
-          a * b
+        env.add_binding(:*, lambda do |cxt, a, b| 
+          a.eval(cxt) * b.eval(cxt)
         end)
 
-        env.add_binding(:/, lambda do |a, b| 
-          a / b
+        env.add_binding(:/, lambda do |cxt, a, b| 
+          a.eval(cxt) / b.eval(cxt)
         end)
 
-        env.add_binding(:write, lambda do |value| 
-          $stdout.print value
+        env.add_binding(:write, lambda do |cxt, value| 
+          $stdout.print value.eval(cxt)
           nil
         end)
 
-        env.add_binding(:inspect, lambda do |object|
-          object.inspect
+        env.add_binding(:inspect, lambda do |cxt, object|
+          object.eval(cxt).inspect
         end)
 
-        env.add_binding(:define, lambda do |parameters, body|
+        env.add_binding(:define, lambda do |cxt, parameters, body|
           if parameters.is_a?(AST::Identifier)
-            # We are declaring a variable. We must eager-evaluate the value.
-            result = if body.is_a?(AST::Procedure)
-              body.eval(env)
-            else
-              body
-            end
-            env.add_binding(parameters.value, result)
+            binded_value = if body.literal?
+                body
+              else
+                body.eval(cxt)
+              end
+            cxt.add_binding(parameters.value, binded_value)
             return nil
           end
-          original_params = parameters.to_a
-          puts "AAAAA"
-          puts original_params.inspect
-          puts body.inspect
-          name = original_params.shift
 
-          env.add_binding(name.value, lambda do |*args|
-            # Create a new scope
-            environment = Environment.new(env)
-            args.each_with_index do |arg, idx|
-              puts 'adding to envirnoment....'
-              puts original_params[idx].value.inspect
-              puts arg.eval(environment)
+          parameters = parameters.to_a
+          name = parameters.shift.value
 
-              environment.add_binding(original_params[idx].value, arg.eval(environment))
+          cxt.add_binding(name, lambda do |context, *params|
+            context = Environment.new(context) 
+
+            params.each_with_index do |param, idx|
+              context.add_binding(parameters[idx].value, param.eval(context))
             end
-            puts environment.instance_variable_get(:@bindings).inspect
-            puts body.inspect
-            body.eval(environment)
+            body.eval(context)
+
           end)
+
           nil
         end)
 
-        env.add_binding(:lambda, lambda do |parameters, body|
-          original_params = parameters.to_a
-          lambda do |*args|
-            environment = Environment.new(env)
-            args.each_with_index do |arg, idx|
-              environment.add_binding(original_params[idx].value, arg.eval(environment))
+        env.add_binding(:lambda, lambda do |cxt, parameters, body|
+
+          parameters = parameters.to_a
+
+          lambda do |context, *params|
+            context = Environment.new(context) 
+
+            params.each_with_index do |param, idx|
+              context.add_binding(parameters[idx].value, param.eval(context))
             end
-            body.eval(environment)
+            body.eval(context)
           end
         end)
 
-        env.add_binding(:car, lambda do |list|
-          list.to_a.first
+        env.add_binding(:car, lambda do |cxt, list|
+          list.eval(cxt).to_a.first
         end)
 
-        env.add_binding(:cdr, lambda do |list|
-          list.to_a.last
+        env.add_binding(:cdr, lambda do |cxt, list|
+          list.eval(cxt).to_a.last
         end)
 
-        env.add_binding(:cadr, lambda do |list|
-          list.to_a.last.elements.first
+        env.add_binding(:cadr, lambda do |cxt, list|
+          list.eval(cxt).to_a.last.elements.first
         end)
 
-        env.add_binding(:caddr, lambda do |list|
-          list.to_a.last.elements.last.elements.first
+        env.add_binding(:caddr, lambda do |cxt, list|
+          puts "evaling caddr #{list.inspect}"
+          puts list.eval(cxt).to_a.inspect
+          list.eval(cxt).to_a
         end)
 
-        env.add_binding(:list, lambda do |*args|
-          AST::List.new(args, env)
+        env.add_binding(:list, lambda do |cxt, *args|
+          args.map! do |arg|
+            arg.eval(cxt)
+          end
+          AST::List.new(args)
         end)
 
-        env.add_binding(:null?, lambda do |object|
-          (object.respond_to?(:empty?) && object.empty?) || object.nil?
+        env.add_binding(:null?, lambda do |cxt, object|
+          obj = object.eval(cxt)
+          (obj.respond_to?(:empty?) && obj.empty?) || obj.nil?
         end)
 
-        env.add_binding("=", lambda do |one, another|
-          one.eval(env) == another.eval(env)
+        env.add_binding("=", lambda do |cxt, one, another|
+          one.eval(cxt) == another.eval(cxt)
         end)
 
-        env.add_binding(:eqv?, lambda do |one, another|
-          one.eval(env) == another.eval(env)
+        env.add_binding(:eqv?, lambda do |cxt, one, another|
+          one.eval(cxt) == another.eval(cxt)
         end)
 
-        env.add_binding(:>, lambda do |one, another|
-          one.eval(env) > another.eval(env)
+        env.add_binding(:>, lambda do |cxt, one, another|
+          one.eval(cxt) > another.eval(cxt)
         end)
 
-        env.add_binding(:<, lambda do |one, another|
-          one.eval(env) < another.eval(env)
+        env.add_binding(:<, lambda do |cxt, one, another|
+          one.eval(cxt) < another.eval(cxt)
         end)
 
-        env.add_binding(:cond, lambda do |*conditions|
+        env.add_binding(:cond, lambda do |cxt, *conditions|
           conditions.map!(&:to_a)
           conditions.each do |condition, result|
-            return result.eval(env) if condition.eval(env)
+            return result.eval(cxt) if condition.eval(cxt)
           end
           nil
         end)

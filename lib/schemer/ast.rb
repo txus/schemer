@@ -8,6 +8,9 @@ module Schemer
       def false?
         !true?
       end
+      def literal?
+        false
+      end
     end
 
     class Comment < Node
@@ -34,6 +37,10 @@ module Schemer
 
       def inspect
         "#<Char::#{@value}>"
+      end
+
+      def literal?
+        true
       end
     end
 
@@ -65,84 +72,43 @@ module Schemer
       end
     end
 
-    class Procedure < Node
-      attr_reader :proc, :args
-
-      def initialize(procedure)
-        @proc = procedure[:proc]
-        @args = procedure[:args].empty? ? nil : procedure[:args].to_a
-      end
-
-      def eval(context)
-        # Evaluate arguments
-        arguments = nil
-        arguments = args.map do |arg|
-          if arg.is_a?(Identifier)
-            arg = context.get_binding(arg.value) || arg
-          else
-            begin
-              arg = arg.eval(context)
-            rescue
-              arg
-            end
-          end
-        end if args
-
-        # Evaluate proc
-        if @proc.respond_to?(:value)
-          block = context.get_binding(@proc.value)
-        else
-          block = @proc
-        end
-
-        block.call(*arguments)
-      rescue NoMethodError=>e
-        puts e.inspect
-        puts e.backtrace.inspect
-        if e.message =~ /#{@proc.value}/
-          raise "#{@proc.value} is not a defined procedure."
-        else
-          raise e
-        end
-      end
-
-      def to_a
-        [@proc, @args].compact.flatten
-      end
-
-      def inspect
-        "#<Procedure @proc=#{@proc.inspect} @args=#{@args || 'nil'}>"
-      end
-    end
-
     class List < Node
       attr_reader :elements
 
-      def initialize(elements, context = nil)
-        if context
-          @elements = elements.map do |element|
-            begin
-              evaled = element.eval(context)
-              evaled || element
-            rescue
-              element
-            end
-          end
-        else
-          @elements = elements
-        end
+      def initialize(elements)
+        @elements = elements
       end
 
       def to_a
         @elements
       end
 
-      def to_list
-        self
-      end
-
       def eval(context)
-        List.new(@elements, context)
+        cdr = @elements.clone
+        car = cdr.shift
+
+        if car.is_a?(Identifier)
+          procedure = context.get_binding(car.value)
+          if procedure
+            return procedure.call(context, *cdr)
+          else
+            raise "UNKNOWN IDENTIFIER #{car.value}"
+          end
+        elsif car.is_a?(List)
+          new_car = car.eval(context)
+          if new_car.is_a?(Identifier)
+            procedure = context.get_binding(car.value)
+            if procedure
+              return procedure.call(context, *cdr)
+            else
+              raise "UNKNOWN IDENTIFIER #{car.value}"
+            end
+          elsif new_car.is_a?(Proc)
+            return new_car.call(context, *cdr)
+          end
+        else
+          return self
+        end
       end
 
       def empty?
@@ -150,23 +116,17 @@ module Schemer
       end
 
       def inspect
-        "#<List @elements=#{@elements}>"
+        "#<List #{@elements}>"
       end
     end
 
-    class QuotedList < Node
-      attr_reader :elements
-
-      def initialize(elements)
-        @elements = elements
-      end
-
+    class QuotedList < List
       def eval(context)
         self
       end
 
       def inspect
-        "#<QuotedList @elements=#{@elements}>"
+        "#<QuotedList #{@elements}>"
       end
     end
 
