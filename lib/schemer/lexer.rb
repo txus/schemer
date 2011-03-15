@@ -36,13 +36,12 @@ module Schemer
 
     rule(:operator)   { `+` | `-` | `*` | `/` | `>=` | `<=` | `>` | `<` | `=` }
 
-    rule(:arg)        { (symbol.as(:identifier) | quoted_list | literal | quoted_symbol | procedure | pair | vector | list) }
+    rule(:arg)        { (symbol | operator | quoted_list | literal | quoted_symbol | pair | vector | list) }
     rule(:args)       { (arg >> space?).repeat }
 
     rule(:comment)    { `;`.repeat(1,3) >> (`\n`.absnt? >> any).repeat.as(:comment) }
-    rule(:procedure) { (lparen >> ((symbol | operator).as(:identifier) | procedure).as(:proc) >> (space? >> args.as(:args)).maybe >> rparen).as(:procedure) }
 
-    rule(:body)       { (procedure | space | comment).repeat(0) }
+    rule(:body)       { (list | space | comment).repeat(0) }
     root :body
 
   end

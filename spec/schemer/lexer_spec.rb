@@ -44,22 +44,20 @@ module Schemer
 
     its(:list) { should parse('(1 2 3)').as(:list => [{:integer => '1'}, {:integer => '2'}, {:integer => '3'}]) }
     its(:list) { should parse('()').as(:list => []) }
-    its(:list) { should parse('( )') }
+    its(:list) { should parse('( )').as(:list => []) }
 
-    its(:procedure) { should parse('(define some "string" #t)') }
-    its(:procedure) { should parse(%q{((lambda some arg) (get_some_proc) yeah "string" ((proc-proc) "another-string"))}) }
-    its(:procedure) { should parse('((lambda) "foo")') }
+    its(:list) { should parse('(define some "string" #t)') }
+    its(:list) { should parse(%q{((lambda some arg) (get_some_proc) yeah "string" ((proc-proc) "another-string"))}) }
+    its(:list) { should parse('((lambda) "foo")') }
 
-    its(:procedure) { should(parse('(lambda (x) (+ x x))')) }
+    its(:list) { should(parse('(lambda x (+ x x))')) }
 
-    its(:procedure) { should parse("((lambda) (1 2 3))") }
-    its(:procedure) { should parse("((lambda) '(1 2 3))") }
-    its(:procedure) { should parse('((lambda) (bar))') }
-    its(:procedure) { should parse('(lambda (define zara \'zara) (write (eqv? zara \'zara)))') }
-    its(:procedure) { should(parse("(lambda (define (make-new-set?) '()) (define (make-new-set?) '(2 3)))").as do |output|
-      output[:procedure][:args].should have(2).procedures
-      output[:procedure][:args].first[:procedure][:args].should include(:quoted_list => [])
-      output[:procedure][:args].last[:procedure][:args].should include(:quoted_list => [{:integer =>"2"}, {:integer => "3"}])
+    its(:list) { should parse("((lambda) (1 2 3))") }
+    its(:list) { should parse("((lambda) '(1 2 3))") }
+    its(:list) { should parse('((lambda) (bar))') }
+    its(:list) { should parse('(lambda (define zara \'zara) (write (eqv? zara \'zara)))') }
+    its(:list) { should(parse("(lambda (define (make-new-set?) '()) (define (make-new-set?) '(2 3)))").as do |output|
+      output[:list].should have(2).lists
     end) }
 
     # Regression tests
