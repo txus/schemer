@@ -36,7 +36,7 @@ module Schemer
 
     rule(:operator)   { `+` | `-` | `*` | `/` | `>=` | `<=` | `>` | `<` | `=` }
 
-    rule(:arg)        { (symbol | operator | quoted_list | literal | quoted_symbol | pair | vector | list) }
+    rule(:arg)        { (symbol.as(:identifier) | operator | quoted_list | literal | quoted_symbol | pair | vector | list) }
     rule(:args)       { (arg >> space?).repeat }
 
     rule(:comment)    { `;`.repeat(1,3) >> (`\n`.absnt? >> any).repeat.as(:comment) }
