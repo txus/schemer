@@ -67,6 +67,10 @@ module Schemer
         @value = identifier
       end
 
+      def eval(context)
+        context.get_binding(@value)
+      end
+
       def inspect
         "#<QuotedIdentifier::#{@value}>"
       end

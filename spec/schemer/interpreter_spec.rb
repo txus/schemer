@@ -86,8 +86,6 @@ module Schemer
           parser = Schemer::Parser.new
           ast = parser.apply(lexer.parse expression) 
 
-          puts ast.inspect
-
           interpreter = Schemer::Interpreter.new(ast)
           result = interpreter.walk
           result.should be_an(AST::List)
@@ -185,19 +183,38 @@ module Schemer
 
     end
 
-    pending 'parses bintree.scm' do
-      file = File.read('examples/bintree.scm')
+    it 'parses equality.scm' do
+      file = File.read('examples/equality.scm')
       lexer = Schemer::Lexer.new
       parser = Schemer::Parser.new
       tokens = lexer.parse(file)
       ast = parser.apply(tokens) 
 
-      puts ast.delete_if{|n| n.is_a?(AST::Comment)}.inspect
       interpreter = Schemer::Interpreter.new(ast)
       result = interpreter.walk
-      puts result.inspect
     end
 
+    it 'parses func.scm' do
+      file = File.read('examples/func.scm')
+      lexer = Schemer::Lexer.new
+      parser = Schemer::Parser.new
+      tokens = lexer.parse(file)
+      ast = parser.apply(tokens) 
+
+      interpreter = Schemer::Interpreter.new(ast)
+      result = interpreter.walk
+    end
+
+    it 'parses simple_func.scm' do
+      file = File.read('examples/simple_func.scm')
+      lexer = Schemer::Lexer.new
+      parser = Schemer::Parser.new
+      tokens = lexer.parse(file)
+      ast = parser.apply(tokens) 
+
+      interpreter = Schemer::Interpreter.new(ast)
+      result = interpreter.walk
+    end
 
   end
 end

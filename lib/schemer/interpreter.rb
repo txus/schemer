@@ -7,8 +7,11 @@ module Schemer
       @ast = ast
       @env = Environment.new do |env|
 
-        env.add_binding(:+, lambda do |cxt, a, b|
-          a.eval(cxt) + b.eval(cxt)
+        env.add_binding(:+, lambda do |cxt, *args|
+          args.map! do |arg|
+            arg.eval(cxt) || 0
+          end
+          args.inject(&:+)
         end)
 
         env.add_binding(:-, lambda do |cxt, a, b| 
@@ -82,13 +85,16 @@ module Schemer
         end)
 
         env.add_binding(:cadr, lambda do |cxt, list|
-          list.eval(cxt).to_a.last.elements.first
+          list.eval(cxt).to_a.
+            last.eval(cxt).to_a.
+            first
         end)
 
         env.add_binding(:caddr, lambda do |cxt, list|
-          puts "evaling caddr #{list.inspect}"
-          puts list.eval(cxt).to_a.inspect
-          list.eval(cxt).to_a
+          l = list.eval(cxt).to_a
+          l = l && l.last ? l.last.eval(cxt).to_a : nil
+          l = l && l.last ? l.last.eval(cxt).to_a : nil
+          l = l && l.first ? l.first : nil
         end)
 
         env.add_binding(:list, lambda do |cxt, *args|
@@ -120,13 +126,20 @@ module Schemer
         end)
 
         env.add_binding(:cond, lambda do |cxt, *conditions|
-          conditions.map!(&:to_a)
-          conditions.each do |condition, result|
+          conds = conditions.respond_to?(:to_a) ? conditions.map(&:to_a) : [conditions]
+          conds.each do |condition, result|
             return result.eval(cxt) if condition.eval(cxt)
           end
           nil
         end)
 
+        env.add_binding(:if, lambda do |cxt, *conditions|
+          conds = conditions.respond_to?(:to_a) ? conditions.map(&:to_a) : [conditions]
+          conds.each do |condition, result|
+            return result.eval(cxt) if condition.eval(cxt)
+          end
+          nil
+        end)
 
       end
     end

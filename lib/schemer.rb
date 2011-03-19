@@ -1,4 +1,5 @@
 require 'schemer/core_ext/fixnum'
+require 'schemer/core_ext/booleans'
 
 require 'parslet'
 
