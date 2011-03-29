@@ -7,7 +7,7 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
-    blankslate (2.1.2.3)
+    blankslate (2.1.2.4)
     configuration (1.2.0)
     diff-lcs (1.1.2)
     guard (0.3.0)
