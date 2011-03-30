@@ -2,7 +2,6 @@ require 'test_helper'
 
 module Schemer
   class LexerTest < MiniTest::Unit::TestCase
-
     def setup
       @lexer = Lexer.new
     end
@@ -78,17 +77,6 @@ module Schemer
       tokenizes("(lambda (define (make-new-set?) '()) (define (make-new-set?) '(2 3)))")
     end
 
-    def test_regression_from_examples_directory
-      Dir["examples/*.scm"].each do |filename|
-        file = File.read(filename)
-        begin
-          @lexer.parse(file)
-        rescue Parslet::ParseFailed
-          flunk "Lexer could not tokenize #{filename}."
-        end
-      end
-    end
-
     private
 
     def tokenizes(input, options = {})
@@ -112,6 +100,5 @@ module Schemer
         @lexer.send(rule).parse(input)
       end
     end
-
   end
 end

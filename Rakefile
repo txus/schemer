@@ -8,7 +8,15 @@ RSpec::Core::RakeTask.new
 require 'rake/testtask'
 Rake::TestTask.new do |t|
   t.libs << "test"
-  t.test_files = FileList['test/**/*_test.rb']
+  t.test_files = FileList['test/**/*_test.rb'] - FileList['test/acceptance/**/*_test.rb']
+  t.verbose = true
+end
+
+require 'rake/testtask'
+desc 'Run acceptance tests (Scheme programs inside examples/ directory)'
+Rake::TestTask.new :acceptance do |t|
+  t.libs << "test"
+  t.test_files = FileList['test/acceptance/**/*_test.rb']
   t.verbose = true
 end
 
