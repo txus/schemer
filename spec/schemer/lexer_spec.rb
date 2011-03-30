@@ -60,16 +60,5 @@ module Schemer
       output[:list].should have(3).elements
     end) }
 
-    # Regression tests
-
-    describe "Regression tests from examples/ directory" do
-      Dir["examples/*.scm"].each do |filename|
-        file = File.read(filename)
-        it "tokenizes #{filename}" do
-          subject.should parse(file)
-        end
-      end
-    end
-
   end
 end
