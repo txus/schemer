@@ -21,6 +21,7 @@ GEM
       configuration (>= 0.0.5)
       rake (>= 0.8.1)
     minitest (2.0.2)
+    mocha (0.9.12)
     open_gem (1.4.2)
       launchy (~> 0.3.5)
     parslet (1.2.0)
@@ -45,6 +46,7 @@ DEPENDENCIES
   guard-minitest
   guard-rspec
   minitest
+  mocha
   rb-fsevent
   rspec (~> 2.5.0)
   schemer!

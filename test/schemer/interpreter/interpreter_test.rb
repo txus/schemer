@@ -20,12 +20,11 @@ module Schemer
       interpreter = Interpreter.new(ast)
 
       ast.each do |node|
-        node.should_receive(:eval).with(kind_of(Environment))
+        node.expects(:eval).with(kind_of(Environment))
       end
 
       interpreter.walk
     end
-
 
   end
 end
