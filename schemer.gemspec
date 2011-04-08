@@ -16,11 +16,9 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'parslet', '~> 1.2.0'
 
-  s.add_development_dependency 'rspec', '~> 2.5.0'
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'guard'
-  s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'guard-minitest'
   s.add_development_dependency 'rb-fsevent'
 
